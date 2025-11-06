@@ -11,39 +11,6 @@ Run locally
 python3 -m venv .venv && source .venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
-
-# (optional for Piper) set envs in this shell:
-export PIPER_BIN="/absolute/path/to/piper"
-export PIPER_MODEL="/absolute/path/to/en_US-amy-medium.onnx"
-export PIPER_CONFIG="/absolute/path/to/en_US-amy-medium.onnx.json"
-
-# start server
-uvicorn server:app --host 0.0.0.0 --port 8080
-
-# client (interactive)
-python3 client.py --engine kokoro
-# or
-python3 client.py --engine piper
-
-------------------------------------------------------------
-Docker (Python 3.9)
-------------------------------------------------------------
-docker build -t tts-ws:py39 .
-docker run --rm -p 8080:8080 \
-  -e PIPER_BIN="/piper/piper" \
-  -e PIPER_MODEL="/models/en_US_amy/en_US-amy-medium.onnx" \
-  -e PIPER_CONFIG="/models/en_US_amy/en_US-amy-medium.onnx.json" \
-  -v /ABS/PATH/piper/bin/piper:/piper/piper:ro \
-  -v /ABS/PATH/piper/models:/models:ro \
-  tts-ws:py39
-# then on host:
-python3 client.py --engine piper   # or --engine kokoro
-
-------------------------------------------------------------
-Get Piper + a voice (to set PIPER_*)
-------------------------------------------------------------
-# 1) install Piper CLI
-python3 -m pip install --upgrade pip
 pip install piper-tts
 which piper
 export PIPER_BIN="$(which piper)"
@@ -55,9 +22,23 @@ curl -L -o ~/piper_voices/en_US-lessac/en_US-lessac-medium.onnx \
 curl -L -o ~/piper_voices/en_US-lessac/en_US-lessac-medium.onnx.json \
   'https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx.json?download=true'
 
-# 3) set env vars
+# (optional for Piper) set envs in this shell:
 export PIPER_MODEL="$HOME/piper_voices/en_US-lessac/en_US-lessac-medium.onnx"
 export PIPER_CONFIG="$HOME/piper_voices/en_US-lessac/en_US-lessac-medium.onnx.json"
+
+# start server
+uvicorn server:app --host 0.0.0.0 --port 8080
+
+# client (interactive)
+python3 client.py --url ws://localhost:8880/ws
+
+------------------------------------------------------------
+Docker (Python 3.9)
+------------------------------------------------------------
+docker build -t tts-ws:py39 .
+docker run -it --rm -p 8880:8880 tts_ws
+ 
+python3 client.py --url ws://localhost:8880/ws
 
 ------------------------------------------------------------
 Notes
