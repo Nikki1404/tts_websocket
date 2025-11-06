@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.4
 FROM python:3.9-slim
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -7,10 +8,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY requirements.txt .
-RUN pip install --upgrade pip setuptools wheel
-RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install --no-cache-dir kokoro piper-tts || true
+
+COPY requirements.txt /app/requirements.txt
+
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --upgrade pip setuptools wheel && \
+    pip install -r /app/requirements.txt && \
+    pip install kokoro piper-tts || true
 
 RUN python3 -c "from kokoro import KPipeline; KPipeline(lang_code='a')"
 
@@ -20,6 +24,8 @@ RUN mkdir -p /app/models/en_US-lessac && \
     curl -L -o /app/models/en_US-lessac/en_US-lessac-medium.onnx.json \
       'https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx.json?download=true'
 
+
 COPY . .
+
 EXPOSE 8880
-CMD ["python3","server.py"]
+CMD ["python3", "server.py"]
