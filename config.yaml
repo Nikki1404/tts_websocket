@@ -1,0 +1,16 @@
+server:
+  host: "0.0.0.0"
+  port: 8880
+  max_message_size: null  # None = unlimited
+
+kokoro:
+  lang: "a"
+  voice: "af_heart"
+  speed: 1.0
+  preload: true
+
+piper:
+  bin: "/usr/local/bin/piper"
+  model: "/app/models/en_US-lessac/en_US-lessac-medium.onnx"
+  config: "/app/models/en_US-lessac/en_US-lessac-medium.onnx.json"
+  extra_flags: ""

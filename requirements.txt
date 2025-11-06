@@ -1,0 +1,13 @@
+websockets
+psutil
+uvicorn
+websockets
+numpy
+soundfile
+pandas
+sounddevice
+pyyaml
+
+# Optional engine:
+kokoro # comment out if not using Kokoro in the image
+piper-tts
